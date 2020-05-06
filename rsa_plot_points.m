@@ -94,6 +94,7 @@ baseline = 100;         % in ms
 sampling_rate = 250;    % in Hz
 n_pc = min(n_features,50);
 color_code = (1:n_stim)';
+sub_color_code = false;
 distance_metric = 'euclidean';
 arg  = 1;
 while arg <= size(varargin,2)
@@ -103,6 +104,9 @@ while arg <= size(varargin,2)
             cat_inds = varargin{arg+1};
             if length(cat_inds) ~= n_stim
                 error('Category indices vector should match the number of stimuli');
+            end
+            if size(cat_inds,2)>size(cat_inds,1)
+                cat_inds = cat_inds';
             end
             cat_names = varargin{arg+2};
             if ~iscell(cat_names)
@@ -125,6 +129,7 @@ while arg <= size(varargin,2)
             elseif size(color_code,1)~=n_stim
                 error('Color-code length should match the number of stimuli')
             end
+            sub_color_code = true;
             arg = arg + 2;
         case 'link_plots'
             link_plots = true;
@@ -148,9 +153,9 @@ if exist('time_ms','var')
     if isempty(time_ms)
         time_inds = linspace(1, seg_duration, 13);
         time_inds = round(time_inds(2:2:13));
-        time_ms = (time_inds*1000/sampling_rate - baseline);
+        time_ms = ((time_inds-1)*1000/sampling_rate - baseline);
     else
-        time_inds = round((time_ms+baseline)*sampling_rate/1000); %turn ts into indices
+        time_inds = floor((time_ms+baseline)*sampling_rate/1000)+1; %turn ts into indices
         if min(time_inds) < 1 || max(time_inds) > seg_duration
             error('Given temporal range exceeds segment duration');
         end
@@ -158,7 +163,7 @@ if exist('time_ms','var')
 else
     time_inds = linspace(0, seg_duration, 13);
     time_inds = round(time_inds(2:2:13));
-    time_ms = (time_inds*1000/sampling_rate - baseline);
+    time_ms = ((time_inds-1)*1000/sampling_rate - baseline);
 end
 
 if length(time_inds)<3
@@ -173,7 +178,9 @@ if categories
     if size(color_code,2)==2
         warning('Using only the 1st color code (basic color-code is by categories)')
     end
-    color_code(:,2) = color_code(:,1);
+    if sub_color_code 
+        color_code(:,2) = color_code(:,1);
+    end
     color_code(:,1) = cat_inds;
 end
 

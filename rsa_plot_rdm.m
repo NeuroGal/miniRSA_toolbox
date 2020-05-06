@@ -62,6 +62,9 @@ while arg <= size(varargin,2)
             if length(cat_inds) ~= n_stim
                 error('Category indices vector should match the number of stimuli');
             end
+            if size(cat_inds,2)>size(cat_inds,1)
+                cat_inds = cat_inds';
+            end
             cat_names = varargin{arg+2};
             if ~iscell(cat_names)
                 error('Category names should be given in a cell array')
@@ -85,9 +88,9 @@ if exist('time_ms','var')
     if isempty(time_ms)
         time_inds = linspace(1, duration, 13);
         time_inds = round(time_inds(2:2:13));
-        time_ms = (time_inds*1000/sampling_rate - baseline);
+        time_ms = ((time_inds-1)*1000/sampling_rate - baseline);
     else
-        time_inds = round((time_ms+baseline)*sampling_rate/1000); %turn ts into indices
+        time_inds = floor((time_ms+baseline)*sampling_rate/1000)+1; %turn ts into indices
         if min(time_inds) < 1 || max(time_inds) > duration
             error('Given temporal range exceeds segment duration');
         end
@@ -95,7 +98,7 @@ if exist('time_ms','var')
 else
     time_inds = linspace(0, duration, 13);
     time_inds = round(time_inds(2:2:13));
-    time_ms = (time_inds*1000/sampling_rate - baseline);
+    time_ms = ((time_inds-1)*1000/sampling_rate - baseline);
 end
 
 % don't include the diagonal in the color range
@@ -145,10 +148,11 @@ for t=1:length(time_inds)
         end
         set(tit,'position',get(tit,'position')-[0 6 0])
         set(gca,'XAxisLocation','top','XTick',tick_locations,'XTickLabels','',...
-            'YTick',tick_locations,'YTickLabels','','colormap',jet);
+            'YTick',tick_locations,'YTickLabels','');
     else
-        set(gca,'XAxisLocation','top','XTickLabels','','YTickLabels','','colormap',jet);
+        set(gca,'XAxisLocation','top','XTickLabels','','YTickLabels','');
     end
+    colormap jet
 end
 cb=colorbar;
 set(cb,'position',[.04 .1 .03 .3])
