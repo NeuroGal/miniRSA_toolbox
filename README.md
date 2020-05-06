@@ -1,6 +1,7 @@
 # miniRSA_toolbox (Matlab)
 A few functions I wrote for getting started with Representational Similarity Analysis (RSA) with temporally resolved data.  
 I had ECoG\EEG\MEG in mind when writing, but maybe other stuff will work too.  
+Checked with Matlab 2019a, so maybe some minor adjustments need to be done for older versions.
   
 Work flow: 1) noise_normalization 2) calculate_rdm 3) rsa_plot_rdm  
 rsa_plot_points can be used at any point along the way.  
