@@ -112,6 +112,9 @@ while arg <= size(varargin,2)
             if ~iscell(cat_names)
                 error('Category names should be given in a cell array')
             end
+            if size(cat_names,2)>size(cat_names,1)
+                cat_names = cat_names';
+            end
             if length(unique(cat_inds))~=length(cat_names)
                 error("Number of category names doesn't match number of categories")
             end
