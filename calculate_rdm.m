@@ -20,12 +20,26 @@ function rdm = calculate_rdm(segs, distance_metric)
 % Written by Gal Vishne, lab of Leon Y. Deouell, 2019-2020
 % Send bug reports and requests to gal.vishne@gmail.com
 
+cross_validated = false;
+if length(size(segs))==4
+    cross_validated = true;
+    warning('Using cross-validated distances according to dim 4')
+end
+
 n_stim = size(segs, 1); seg_duration = size(segs, 3);
 rdm = nan(n_stim, n_stim, seg_duration);
 
-for t=1:seg_duration
-    X = segs(:,:,t);
-    rdm(:,:,t) = squareform(pdist(X, distance_metric));
+if ~cross_validated    
+    for t=1:seg_duration
+        X = segs(:,:,t);
+        rdm(:,:,t) = squareform(pdist(X, distance_metric));
+    end
+else
+    for t=1:seg_duration
+        X1 = segs(:,:,t,1);
+        X2 = segs(:,:,t,2);
+        rdm(:,:,t) = (pdist2(X1,X2, distance_metric)+pdist2(X2,X1, distance_metric))/2;
+    end   
 end
-
+    
 end

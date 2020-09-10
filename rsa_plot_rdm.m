@@ -41,6 +41,8 @@ function fig=rsa_plot_rdm(rdm, time_ms, varargin)
 %           sampling rate for the conversion of ms to indices.
 %       - 'baseline' followed by a number (in ms) - change the baseline
 %           duration for the conversion of ms to indices.
+%       - 'cross_validated' if the distances are cross validated and you
+%           don't want to remove the diagonal
 %
 % Output: figure with RDMs. Distances between subplots and location of
 % category numbers might require tweeking for your computer's settings.
@@ -53,6 +55,7 @@ n_stim = size(rdm,1); duration = size(rdm,3);
 categories = false;
 baseline = 100;         % in ms
 sampling_rate = 250;    % in Hz
+cross_validated = false;
 arg  = 1;
 while arg <= size(varargin,2)
     switch varargin{arg}
@@ -79,6 +82,9 @@ while arg <= size(varargin,2)
         case 'sampling_rate'
             sampling_rate = varargin{arg+1};
             arg = arg + 2;
+        case 'cross_validated'
+            cross_validated = true;
+            arg = arg + 1;
         otherwise
             error(['Unknown optional argument name: ' varargin{arg} '.']);
     end
@@ -103,8 +109,10 @@ end
 
 % don't include the diagonal in the color range
 all_dists_plotted = rdm(:,:,time_inds);
-for t = 1:length(time_inds)
-    all_dists_plotted(:,:,t)=all_dists_plotted(:,:,t)+diag(nan(size(all_dists_plotted,1),1));
+if ~cross_validated
+    for t = 1:length(time_inds)
+        all_dists_plotted(:,:,t)=all_dists_plotted(:,:,t)+diag(nan(size(all_dists_plotted,1),1));
+    end
 end
 color_range = [nanmin(all_dists_plotted(:)), nanmax(all_dists_plotted(:))];
 
